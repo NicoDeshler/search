@@ -72,6 +72,30 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
+
+def graphSearch(problem,fringe):
+    closed = set()
+
+    fringe.push([problem.getStartState(),[]])
+
+    while not fringe.isEmpty():
+        node,path = fringe.pop()
+
+        if problem.isGoalState(node):
+            return path
+        # test if node has already been explored
+        if not node in closed:
+            # add unexplored node to the closed set
+            closed.add(node)
+            # and push its children to the fringe
+            for child_node in problem.getSuccessors(node):
+                child_path = path.copy()
+                child_path.append(child_node[1])
+                fringe.push([child_node[0],child_path])
+    return None
+
+
+"""
 def graphSearch(problem,fringe,path_container,hasPriorityFn):
     # A closed set for keeping track of visited nodes in graph search
     closed = set()
@@ -114,7 +138,7 @@ def graphSearch(problem,fringe,path_container,hasPriorityFn):
 
     return None
 
-
+"""
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
@@ -133,9 +157,9 @@ def depthFirstSearch(problem):
 
     # LIFO stack for DFS fringe
     fringe = util.Stack()
-    path_container = util.Stack()
-
-    return graphSearch(problem,fringe,path_container,False)
+    #path_container = util.Stack()
+    #return graphSearch(problem,fringe,path_container,False)
+    return graphSearch(problem,fringe)
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
@@ -143,19 +167,24 @@ def breadthFirstSearch(problem):
 
     # FIFO queue for BFS fringe
     fringe = util.Queue()
-    path_container = util.Queue()
-
-    return graphSearch(problem,fringe,path_container,False)
+    #path_container = util.Queue()
+    #return graphSearch(problem,fringe,path_container,False)
+    return graphSearch(problem,fringe)
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
 
     # Priority queue for UCS fringe
-    fringe = util.PriorityQueue()
-    path_container = util.PriorityQueue()
+    def cost_fn(item):
+        return problem.getCostOfActions(item[1])
 
-    return graphSearch(problem,fringe,path_container,True)
+
+    fringe = util.PriorityQueueWithFunction(cost_fn)
+    #fringe = util.PriorityQueue()
+    #path_container = util.PriorityQueue()
+    #return graphSearch(problem,fringe,path_container,True)
+    return  graphSearch(problem,fringe)
 
 
 def nullHeuristic(state, problem=None):
@@ -168,7 +197,12 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    def aStar_fn(item):
+        return problem.getCostOfActions(item[1]) + heuristic(item[0],problem)
+
+    # Priority queue for UCS fringe
+    fringe = util.PriorityQueueWithFunction(aStar_fn)
+    return graphSearch(problem,fringe)
 
 
 # Abbreviations
