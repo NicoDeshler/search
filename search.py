@@ -87,7 +87,38 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    # A closed set for keeping track of visited nodes in graph search
+    closed = set()
+    # LIFO stack for fringe
+    fringe = util.Stack()
+    # Initialize fringe with start state
+    fringe.push(problem.getStartState())
+    # Initialize path stack to keep track of paths leading to each node on fringe
+    path_container = util.Stack()
+    path_container.push([])
+
+    while not fringe.isEmpty():
+        # get highest priority node at beginning of fringe
+        node = fringe.pop()
+        # get path up to node
+        path = path_container.pop()
+        # test if node is goal state
+        if problem.isGoalState(node):
+            return path
+
+        # test if node has already been explored
+        if not node in closed:
+            # add unexplored node to the closed set
+            closed.add(node)
+            # and push its children to the fringe
+            for child_node in problem.getSuccessors(node):
+                fringe.push(child_node[0])
+                child_path = path.copy()
+                child_path.append(child_node[1])
+                path_container.push(child_path)
+
+    return None
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
