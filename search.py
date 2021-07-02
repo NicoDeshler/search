@@ -72,6 +72,37 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
+def graphSearch(problem,fringe,path_container):
+    # A closed set for keeping track of visited nodes in graph search
+    closed = set()
+    # Initialize fringe with start state
+    fringe.push(problem.getStartState())
+    # Initialize path stack to keep track of paths leading to each node on fringe
+    path_container.push([])
+
+    while not fringe.isEmpty():
+        # get highest priority node at beginning of fringe
+        node = fringe.pop()
+        # get path up to node
+        path = path_container.pop()
+        # test if node is goal state
+        if problem.isGoalState(node):
+            return path
+
+        # test if node has already been explored
+        if not node in closed:
+            # add unexplored node to the closed set
+            closed.add(node)
+            # and push its children to the fringe
+            for child_node in problem.getSuccessors(node):
+                fringe.push(child_node[0])
+                child_path = path.copy()
+                child_path.append(child_node[1])
+                path_container.push(child_path)
+
+    return None
+
+
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
@@ -87,79 +118,33 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    # A closed set for keeping track of visited nodes in graph search
-    closed = set()
-    # LIFO stack for fringe
+
+    # LIFO stack for DFS fringe
     fringe = util.Stack()
-    # Initialize fringe with start state
-    fringe.push(problem.getStartState())
-    # Initialize path stack to keep track of paths leading to each node on fringe
     path_container = util.Stack()
-    path_container.push([])
 
-    while not fringe.isEmpty():
-        # get highest priority node at beginning of fringe
-        node = fringe.pop()
-        # get path up to node
-        path = path_container.pop()
-        # test if node is goal state
-        if problem.isGoalState(node):
-            return path
-
-        # test if node has already been explored
-        if not node in closed:
-            # add unexplored node to the closed set
-            closed.add(node)
-            # and push its children to the fringe
-            for child_node in problem.getSuccessors(node):
-                fringe.push(child_node[0])
-                child_path = path.copy()
-                child_path.append(child_node[1])
-                path_container.push(child_path)
-
-    return None
+    return graphSearch(problem,fringe,path_container)
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    # A closed set for keeping track of visited nodes in graph search
-    closed = set()
-    # FIFO queue for fringe
+
+    # FIFO queue for BFS fringe
     fringe = util.Queue()
-    # Initialize fringe with start state
-    fringe.push(problem.getStartState())
-    # Initialize path stack to keep track of paths leading to each node on fringe
     path_container = util.Queue()
-    path_container.push([])
 
-    while not fringe.isEmpty():
-        # get highest priority node at beginning of fringe
-        node = fringe.pop()
-        # get path up to node
-        path = path_container.pop()
-        # test if node is goal state
-        if problem.isGoalState(node):
-            return path
-
-        # test if node has already been explored
-        if not node in closed:
-            # add unexplored node to the closed set
-            closed.add(node)
-            # and push its children to the fringe
-            for child_node in problem.getSuccessors(node):
-                fringe.push(child_node[0])
-                child_path = path.copy()
-                child_path.append(child_node[1])
-                path_container.push(child_path)
-
-    return None
-
-
+    return graphSearch(problem,fringe,path_container)
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    # Priority queue for UCS fringe
+    fringe = util.PriorityQueueWithFunction()
+    path_container = util.PriorityQueueWithFunction()
+
+    return graphSearch(problem,fringe,path_container)
+
 
 def nullHeuristic(state, problem=None):
     """
