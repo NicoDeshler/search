@@ -288,6 +288,8 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+        self.corners_reached_start = (False,False,False,False)
+
 
     def getStartState(self):
         """
@@ -295,14 +297,23 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # States must encode the position of Pacman in addition to which corners have been visited
+        corners_reached  = list(self.corners_reached_start)
+
+        # Make sure we account for the starting position being a corner
+        try:
+            corners_reached[self.corners.index(self.startingPosition)] = True
+        except ValueError:
+            # catches error from position not being a corner
+            pass
+        return (self.startingPosition,tuple(corners_reached))
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return all(state[1])
 
     def getSuccessors(self, state):
         """
@@ -325,6 +336,22 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            x, y = state[0]
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+            if not hitsWall:
+                corners_reached = list(state[1])
+
+                # update corners reached if the successor position is a corner
+                try:
+                    corners_reached[self.corners.index((nextx,nexty))] = True
+                except ValueError:
+                    # catches error from (nextx,nexty) not being a corner
+                    pass
+                finally:
+                    successors.append((((nextx, nexty),tuple(corners_reached)), action, 1))
+
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
