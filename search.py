@@ -72,13 +72,19 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
-def graphSearch(problem,fringe,path_container):
+def graphSearch(problem,fringe,path_container,hasPriorityFn):
     # A closed set for keeping track of visited nodes in graph search
     closed = set()
-    # Initialize fringe with start state
-    fringe.push(problem.getStartState())
-    # Initialize path stack to keep track of paths leading to each node on fringe
-    path_container.push([])
+
+    if hasPriorityFn:
+        # Initialize fringe with start state
+        fringe.push(problem.getStartState(),0)
+        # Initialize path stack to keep track of paths leading to each node on fringe
+        path_container.push([],0)
+    else:
+        fringe.push(problem.getStartState())
+        # Initialize path stack to keep track of paths leading to each node on fringe
+        path_container.push([])
 
     while not fringe.isEmpty():
         # get highest priority node at beginning of fringe
@@ -95,10 +101,16 @@ def graphSearch(problem,fringe,path_container):
             closed.add(node)
             # and push its children to the fringe
             for child_node in problem.getSuccessors(node):
-                fringe.push(child_node[0])
                 child_path = path.copy()
                 child_path.append(child_node[1])
-                path_container.push(child_path)
+
+                if hasPriorityFn:
+                    cost = problem.getCostOfActions(child_path)
+                    path_container.push(child_path,cost)
+                    fringe.push(child_node[0],cost)
+                else:
+                    path_container.push(child_path)
+                    fringe.push(child_node[0])
 
     return None
 
@@ -123,7 +135,7 @@ def depthFirstSearch(problem):
     fringe = util.Stack()
     path_container = util.Stack()
 
-    return graphSearch(problem,fringe,path_container)
+    return graphSearch(problem,fringe,path_container,False)
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
@@ -133,17 +145,17 @@ def breadthFirstSearch(problem):
     fringe = util.Queue()
     path_container = util.Queue()
 
-    return graphSearch(problem,fringe,path_container)
+    return graphSearch(problem,fringe,path_container,False)
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
 
     # Priority queue for UCS fringe
-    fringe = util.PriorityQueueWithFunction()
-    path_container = util.PriorityQueueWithFunction()
+    fringe = util.PriorityQueue()
+    path_container = util.PriorityQueue()
 
-    return graphSearch(problem,fringe,path_container)
+    return graphSearch(problem,fringe,path_container,True)
 
 
 def nullHeuristic(state, problem=None):
