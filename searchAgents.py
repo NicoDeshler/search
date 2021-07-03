@@ -385,9 +385,20 @@ def cornersHeuristic(state, problem):
     """
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
-
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    def num_manhattan_paths(xy1,xy2):
+        "Returns the number of Manhattan paths between points xy1 and xy2"
+        m = abs(xy1[0] - xy2[0])
+        n = abs(xy1[1] - xy2[1])
+        #num_paths = (m+n)!/(m! * n!)
+        return 0
+
+    corners_reached = state[1]
+    manhattan_to_corners = [util.manhattanDistance(state[0],corners[i]) for i in range(len(corners)) if not corners_reached[i]]
+    if len(manhattan_to_corners) > 0:
+        return min(manhattan_to_corners)
+    else:
+        return 0
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -481,6 +492,9 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
+    food_coords = foodGrid.asList()
+    #mazeDistance(position, ,)
+
     return 0
 
 class ClosestDotSearchAgent(SearchAgent):
@@ -512,6 +526,7 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
+
         util.raiseNotDefined()
 
 class AnyFoodSearchProblem(PositionSearchProblem):
@@ -548,7 +563,8 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return (x,y) in self.food.asList()
+
 
 def mazeDistance(point1, point2, gameState):
     """
